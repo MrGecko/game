@@ -12,19 +12,14 @@ local BLOCK_TYPE = {
     basalt = {img = "media/block/basalt.png"}
 }
 
-
-
-
 setDefault(BLOCK_TYPE, BLOCK_TYPE.default)
 
 
-Block = {
-
-}
-
 function newBlock(self_type, x, y)
 
-    local self = { }
+    local self = {}
+
+    self.__index = index
 
     local function initialize(self_type, x, y)
         --self position on screen
