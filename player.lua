@@ -29,8 +29,7 @@ function newPlayer()
        end
 
        if love.keyboard.isDown(" ") then
-            print("drop")
-
+            block_manager:startDroppingCurrentBlock()
        end
 
    end

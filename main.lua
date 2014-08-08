@@ -22,8 +22,9 @@ function love.load()
     block_manager = newBlockManager()
     player = newPlayer()
 
-    block_manager:pushBlock("basalt")
-    block_manager:pushBlock("basalt")
+    for i=1,20 do
+        block_manager:pushBlock("basalt")
+    end
 
 end
 
