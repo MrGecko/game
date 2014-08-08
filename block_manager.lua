@@ -10,6 +10,8 @@ require("block")
 require("well")
 
 
+
+
 function newBlockManager()
 
     local self = {
@@ -22,26 +24,29 @@ function newBlockManager()
         fast_drop_speed = 900,
         dropping = false,
 
+        group_size = 3,
+
         block_queue = {
-            last_idx = 0
+            
         },
 
-
         well = nil
-
     }
-
+    
+    
     local function initialize()
         local size = 32
-        local padX = 20
-        local padY = love.window.getHeight() - size * 16 - 20
-        self.well = newWell(padX,padY,4,8,size)
+        local nb_width, nb_height = 12, 15
+        local padX = 204
+        local padY = 52
+        self.well = newWell(padX, padY, nb_width, nb_height, size)
     end
 
-    -- get a preview of the last block of the queue
+    -- peek the last block of the queue
     local function peekLastBlock()
-        return self.block_queue[self.block_queue.last_idx]
-        --end
+        --local a, b, c = #self.block_queue - 1, #self.block_queue, #self.block_queue + 1
+        --a, b, c = self.block_queue[a], self.block_queue[b], self.block_queue[c]
+        return self.block_queue[#self.block_queue]
     end
     
     -- push a new block to the queue and place it in the middle column
@@ -50,22 +55,22 @@ function newBlockManager()
         local y = self.well:getY()
 
         local new_block = newBlock(block_type, x , y)
-        self.block_queue.last_idx = self.block_queue.last_idx + 1
-        self.block_queue[self.block_queue.last_idx] = new_block
+        self.block_queue[#self.block_queue + 1] = new_block
     end
     
+    -- pop the last block from the queue and return it
     local function popLastBlock()
-        if self.block_queue.last_idx <= 0 then
+        if #self.block_queue <= 0 then
             return nil --error("list is empty")
         else
-            local last_block = self.block_queue[self.block_queue.last_idx]
-            self.block_queue[self.block_queue.last_idx] = nil
-            self.block_queue.last_idx = self.block_queue.last_idx - 1
+            local last_block = self.block_queue[#self.block_queue]
+            self.block_queue[#self.block_queue] = nil
             return last_block
         end
     end
 
-    -- get the number of the column where is located the current block
+
+    -- get the idx of the column where is located the current block
     local function getCurrentColumn()
         local col = nil
         local cb = peekLastBlock()
@@ -76,22 +81,24 @@ function newBlockManager()
     end
 
 
-    --move the current block on the horizontal starting line
+    -- move the current block on the horizontal axis
     local function moveCurrentBlock(caller, dx, dy)
         local cb = peekLastBlock()
 
+        -- check if it is time to move
         if cb ~= nil and self.last_move >= self.move_speed then
             local col = getCurrentColumn()
             local next_col = col + dx
    
-                        
+            -- boundarie checks
             if next_col < 1 or next_col > self.well:getColumnCount()  then
                 dx = 0
             else
+                -- check in order to not pass through higher columns
                 local current_floor = self.well:getBlockLine(cb) 
                 local next_floor = self.well:getFloorLine(next_col)
-                
                 if next_floor > current_floor then
+                    -- calculate the horizontal delta for the block movement
                     dx = self.well:getColumnX(next_col) - cb.getLeft()
                 else
                     dx = 0
@@ -163,7 +170,7 @@ function newBlockManager()
             love.graphics.print("column: " .. getCurrentColumn())
         end
         
-        love.graphics.print("blocks in queue: " .. self.block_queue.last_idx, 0, 30)
+        love.graphics.print("blocks in queue: " .. #self.block_queue, 0, 30)
     end
 
 

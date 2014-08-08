@@ -7,27 +7,49 @@
 --
 require("table_helpers")
 
-local BLOCK_TYPE = {
-    default = {img = "media/block/default.png"},
-    basalt = {img = "media/block/basalt.png"}
-}
 
+
+BLOCK_TYPE = {
+    
+    default = {name = "default", img = "media/block/default.png"},
+    lava = {name = "lava", img = "media/block/lava01.png"},
+    basalte = {name = "basalet", img = "media/block/basalt.png"},
+    schiste = {name = "schiste", img = "media/block/schiste.png"},
+    glaise = {name = "glaise", img = "media/block/glaise.png"},
+    
+}
 setDefault(BLOCK_TYPE, BLOCK_TYPE.default)
 
+function getRandomBlockType()
+   local _t = {}
+   local n = 0
+   for i, k in pairs(BLOCK_TYPE) do 
+       n = n + 1
+       _t[n] = i
+   end   
+   local block = _t[math.random(n)]
+   if block == "default" then
+       return getRandomBlockType()
+   else 
+       return block
+   end
+end    
 
-function newBlock(self_type, x, y)
+
+
+function newBlock(block_type, x, y)
 
     local self = {}
 
     self.__index = index
 
-    local function initialize(self_type, x, y)
+    local function initialize(block_type, x, y)
         --self position on screen
         self.x = x
         self.y = y
 
         --self texture
-        self.image = love.graphics.newImage(BLOCK_TYPE[self_type].img)
+        self.image = love.graphics.newImage(BLOCK_TYPE[block_type].img)
     end
 
     local function getHeight() return self.image:getHeight() end
@@ -48,7 +70,7 @@ function newBlock(self_type, x, y)
     end
 
     --initialize the new self
-    initialize(self_type, x, y)
+    initialize(block_type, x, y)
 
     return {
         getWidth = getWidth,

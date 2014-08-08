@@ -13,16 +13,19 @@ function newGameFrame(...)
 
     local function initialize(...)
 
-        love.graphics.setBackgroundColor(60, 60, 65, 255)
-
-        self.right_frame = love.graphics.newImage("media/frame/right_box.png")
+        --love.graphics.setBackgroundColor(60, 60, 65, 255)
+        self.background = love.graphics.newImage("media/frame/background.png")
+        
+        
+        --self.right_frame = love.graphics.newImage("media/frame/right_box.png")
         print("Game Frame initialized")
         return self
     end
 
     local function draw()
         love.graphics.print("Darwin", 0, 14)
-        love.graphics.draw(self.right_frame, self.right_frame:getWidth(), self.right_frame:getHeight())
+        love.graphics.draw(self.background)
+        --love.graphics.draw(self.right_frame, self.right_frame:getWidth(), self.right_frame:getHeight())
     end
 
     --call the initialization method

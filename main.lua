@@ -14,16 +14,20 @@ require "player"
 
 
 function love.load()
-    --image = love.graphics.newImage("media/frame/right_box.png")
+    
+    love.window.setMode(800, 600)
+    
     love.keyboard.setKeyRepeat(true)
 
     game_frame = newGameFrame()
 
     block_manager = newBlockManager()
     player = newPlayer()
+    
 
-    for i=1,50 do
-        block_manager:pushBlock("basalt")
+    for i=1,3*15 do
+        local random_type = getRandomBlockType()
+        block_manager:pushBlock(random_type)
     end
 
 end

@@ -54,7 +54,7 @@ function newWell(x, y, nb_width, nb_height, size)
         if self.grid[x][y] then
             error("cannot set block " .. x .. "," .. y .. ": it is not empty")
         else
-            print("set block[" .. x .. "," .. y .. "]")
+            --print("set block[" .. x .. "," .. y .. "]")
             self.grid[x][y] = block
         end
     end
@@ -78,16 +78,11 @@ function newWell(x, y, nb_width, nb_height, size)
     local function draw()
 
         --outer rect
-        love.graphics.setColor(140, 62, 52, 255)
-        love.graphics.rectangle("fill",
-            self.x - self.padding.left,
-            self.y,
-            self.width * self.size + self.padding.left + self.padding.right,
-            self.height * self.size + self.padding.bottom)
+    
 
         --inner rect
-        love.graphics.setColor(84, 84, 84, 255)
-        love.graphics.rectangle("fill", self.x, self.y, self.width*self.size, self.height*self.size)
+        love.graphics.setColor(124, 124, 124, 70)
+        love.graphics.rectangle("fill", self.x-2, self.y-2, self.width*self.size+4, self.height*self.size+4)
 
         love.graphics.setColor(255, 255, 255, 255 )
         
