@@ -17,7 +17,7 @@ function newBlockManager()
         move_speed = 0.15,
 
         last_drop = 0,
-        drop_speed = 400,
+        drop_speed = 700,
         dropping = false,
 
         block_queue = {
@@ -106,17 +106,14 @@ function newBlockManager()
             local floor = self.well:getFloorLine(col) 
             
             if floor >= 5 then
-                local dy = self.drop_speed * dt
+                local dy = math.floor(self.drop_speed * dt)
+                local floor_line = (self.well:getY() + (floor) * self.well:getSize())
                 
-                if (cb:getBottom() + dy) > (self.well:getY() + floor * self.well:getSize()) then
-                    dy = cb:getBottom() - (self.well:getY() + (floor - 1) * self.well:getSize())
+                if (cb:getBottom() + dy) > floor_line then
+                    dy = floor_line - cb:getBottom()
                     self.dropping = false
                     self.last_drop = 0
-                    
-                    local x = col
-                    local block = popLastBlock()
-                    local y = floor      
-                    self.well:setBlock(x, y, block)
+                    self.well:setBlock(col, floor, popLastBlock())
                 end
                 cb:move(0, dy)
         
@@ -145,7 +142,8 @@ function newBlockManager()
             cb:draw()
             love.graphics.print("column: " .. getCurrentColumn())
         end
-
+        
+        love.graphics.print("blocks in queue: " .. self.block_queue.last_idx, 0, 30)
     end
 
 

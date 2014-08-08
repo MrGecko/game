@@ -38,6 +38,7 @@ function newWell(x, y, nb_width, nb_height, size)
     end
     
     local function getBlockLine(caller, block)
+        print("block top:" .. block:getTop() .. ", " .. (1+(block:getTop() - self.y) / self.size))
         return 1 + math.ceil((block:getTop() - self.y) / self.size)
     end
 
@@ -67,8 +68,6 @@ function newWell(x, y, nb_width, nb_height, size)
                break
            end
        end 
-       print("floor["..col.."] = " .. floor)
-       print(self.grid[col][y])
        
        return floor
     end
