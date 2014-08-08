@@ -25,9 +25,11 @@ function love.load()
     player = newPlayer()
     
 
-    for i=1,3*15 do
-        local random_type = getRandomBlockType()
-        block_manager:pushBlock(random_type)
+    for i=1,7 do
+        local a = getRandomBlockType()
+        local b = getRandomBlockType()
+        local c = getRandomBlockType()
+        block_manager:pushLastGroup({a, b, c})
     end
 
 end

@@ -19,12 +19,12 @@ function newPlayer()
        self.direction = "idle"
 
        if love.keyboard.isDown("right", "d") then
-           block_manager:moveCurrentBlock(1, 0)
+           block_manager:moveCurrentGroup(1, 0)
            self.direction = "right"
        end
 
        if love.keyboard.isDown("left", "q", "a") then
-           block_manager:moveCurrentBlock(-1, 0)
+           block_manager:moveCurrentGroup(-1, 0)
            self.direction = "left"
        end
 
