@@ -13,7 +13,7 @@ function newGameFrame(...)
 
     local function initialize(...)
 
-        love.graphics.setBackgroundColor(30, 30, 35, 255)
+        love.graphics.setBackgroundColor(60, 60, 65, 255)
 
         self.right_frame = love.graphics.newImage("media/frame/right_box.png")
         print("Game Frame initialized")

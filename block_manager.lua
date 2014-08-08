@@ -17,12 +17,15 @@ function newBlockManager()
         move_speed = 0.15,
 
         last_drop = 0,
-        drop_speed = 700,
+        drop_speed = 250,
+        slow_drop_speed = 250,
+        fast_drop_speed = 900,
         dropping = false,
 
         block_queue = {
             last_idx = 0
         },
+
 
         well = nil
 
@@ -32,7 +35,7 @@ function newBlockManager()
         local size = 32
         local padX = 20
         local padY = love.window.getHeight() - size * 16 - 20
-        self.well = newWell(padX,padY,10,16,size)
+        self.well = newWell(padX,padY,4,8,size)
     end
 
     -- get a preview of the last block of the queue
@@ -78,12 +81,21 @@ function newBlockManager()
         local cb = peekLastBlock()
 
         if cb ~= nil and self.last_move >= self.move_speed then
-            local next_col = getCurrentColumn() + dx
-
-            if next_col < 1 or next_col > self.well:getColumnCount() then
+            local col = getCurrentColumn()
+            local next_col = col + dx
+   
+                        
+            if next_col < 1 or next_col > self.well:getColumnCount()  then
                 dx = 0
             else
-                dx = self.well:getColumnX(next_col) - cb.getLeft()
+                local current_floor = self.well:getBlockLine(cb) 
+                local next_floor = self.well:getFloorLine(next_col)
+                
+                if next_floor > current_floor then
+                    dx = self.well:getColumnX(next_col) - cb.getLeft()
+                else
+                    dx = 0
+                end
             end
 
             self.last_move = 0
@@ -105,7 +117,7 @@ function newBlockManager()
             local col = getCurrentColumn()
             local floor = self.well:getFloorLine(col) 
             
-            if floor >= 5 then
+            if floor >= self.well:getLimitLine() then
                 local dy = math.floor(self.drop_speed * dt)
                 local floor_line = (self.well:getY() + (floor) * self.well:getSize())
                 
@@ -122,6 +134,14 @@ function newBlockManager()
                 self.last_drop = 0    
             end
         end
+    end
+    
+    local function enableFastDrop()
+        self.drop_speed = self.fast_drop_speed
+    end
+    
+    local function disableFastDrop()
+        self.drop_speed = self.slow_drop_speed
     end
 
     local function update(caller, dt)
@@ -156,6 +176,9 @@ function newBlockManager()
 
         moveCurrentBlock = moveCurrentBlock,
         startDroppingCurrentBlock = startDroppingCurrentBlock,
+        
+        enableFastDrop = enableFastDrop,
+        disableFastDrop = disableFastDrop,
 
         update = update,
         draw = draw,

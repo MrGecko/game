@@ -31,6 +31,12 @@ function newPlayer()
        if love.keyboard.isDown(" ") then
             block_manager:startDroppingCurrentBlock()
        end
+       
+       if love.keyboard.isDown("lshift") then
+           block_manager:enableFastDrop()
+       else
+           block_manager:disableFastDrop()
+       end
 
    end
 

@@ -17,7 +17,9 @@ function newWell(x, y, nb_width, nb_height, size)
         height = nb_height,
         size = size,
 
-        padding = {top=2, left=4, bottom=6, right=4 },
+        limit_line = 3,
+        
+        padding = {top=2, left=6, bottom=6, right=6 },
 
         grid =  {}
     }
@@ -27,6 +29,8 @@ function newWell(x, y, nb_width, nb_height, size)
     local function getWidth() return self.width end
     local function getHeight() return self.height end
     local function getSize() return self.size end
+    
+    local function getLimitLine() return self.limit_line end
     
     -- get the count of columns
     local function getColumnCount()
@@ -38,7 +42,6 @@ function newWell(x, y, nb_width, nb_height, size)
     end
     
     local function getBlockLine(caller, block)
-        print("block top:" .. block:getTop() .. ", " .. (1+(block:getTop() - self.y) / self.size))
         return 1 + math.ceil((block:getTop() - self.y) / self.size)
     end
 
@@ -75,15 +78,15 @@ function newWell(x, y, nb_width, nb_height, size)
     local function draw()
 
         --outer rect
-        love.graphics.setColor(50, 50, 50, 110)
+        love.graphics.setColor(140, 62, 52, 255)
         love.graphics.rectangle("fill",
             self.x - self.padding.left,
-            self.y - self.padding.top,
+            self.y,
             self.width * self.size + self.padding.left + self.padding.right,
-            self.height * self.size + self.padding.top + self.padding.bottom)
+            self.height * self.size + self.padding.bottom)
 
         --inner rect
-        love.graphics.setColor(50, 50, 50, 255)
+        love.graphics.setColor(84, 84, 84, 255)
         love.graphics.rectangle("fill", self.x, self.y, self.width*self.size, self.height*self.size)
 
         love.graphics.setColor(255, 255, 255, 255 )
@@ -115,6 +118,8 @@ function newWell(x, y, nb_width, nb_height, size)
         getWidth = getWidth,
         getHeight = getHeight,
         getSize = getSize,
+
+        getLimitLine = getLimitLine,
 
         getColumnCount = getColumnCount,
         getColumnNumber = getColumnNumber,
