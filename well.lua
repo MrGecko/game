@@ -66,7 +66,7 @@ function newWell(x, y, nb_width, nb_height, size)
     local function getFloorLine(caller, col)
        local floor = self.height
        for y=1,self.height do
-           if self.grid[col][y] then               
+           if self.grid[col][y] then  
                floor = y - 1
                break
            end

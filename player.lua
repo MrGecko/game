@@ -29,7 +29,7 @@ function newPlayer()
        end
 
        if love.keyboard.isDown(" ") then
-            block_manager:startDroppingCurrentBlock()
+            block_manager:startDroppingCurrentGroup()
        end
        
        if love.keyboard.isDown("lshift") then

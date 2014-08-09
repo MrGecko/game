@@ -40,7 +40,8 @@ end
 function newBlock(block_type, x, y)
 
     local self = {
-        last_move = 0
+        last_move = 0,
+        dropped = false
     }
 
     self.__index = index
@@ -62,12 +63,12 @@ function newBlock(block_type, x, y)
     local function getLeft() return self.x end
     local function getTop() return self.y end
     
-    local function getLastMove()
-        return self.last_move
+    local function setDropped(t) 
+        self.dropped = t
     end
     
-    local function setLastMove(caller, t) 
-        self.last_move = t
+    local function isDropped() 
+        return self.dropped
     end
 
     local function move(caller, dx, dy)
@@ -91,8 +92,9 @@ function newBlock(block_type, x, y)
         getLeft = getLeft,
         getTop = getTop,
 
-        getLastMove = getLastMove,
-        setLastMove = setLastMove,
+      
+        setDropped = setDropped,
+        isDropped = isDropped,
         
         move = move,
         draw = draw
