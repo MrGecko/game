@@ -15,7 +15,7 @@ require "player"
 
 function love.load()
     
-    love.window.setMode(800, 600)
+    love.window.setMode(920, 600)
     
     love.keyboard.setKeyRepeat(true)
 
@@ -23,14 +23,13 @@ function love.load()
 
     player = Player.new()
 
-    block_manager = BlockManager.new()
+    block_manager = BlockManager.new(8, 11)
     
 
     for i=1,20 do
         local a = getRandomBlockType()
         local b = getRandomBlockType()
-        local c = getRandomBlockType()
-        block_manager.push({a, b, c})
+        block_manager.push({a, b})
     end
     
     block_manager.initialize()

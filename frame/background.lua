@@ -16,11 +16,12 @@ function BackgroundFrame.new(...)
   
   function self.initialize(...)
     --self.background_image = love.graphics.newImage("media/frame/background.png")
-    
+    love.graphics.setBackgroundColor(47, 47, 47, 255)
     print("Game Frame initialized")
   end
 
   function self.draw()
+      
       love.graphics.print("Darwin", 0, 14)
       --love.graphics.draw(background_image)
       --love.graphics.draw(self.right_frame, self.right_frame:getWidth(), self.right_frame:getHeight())

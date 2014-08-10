@@ -15,10 +15,10 @@ require("block/block")
 BLOCK_TYPE = {
     
     default = {name = "default", img = "media/block/default.png"},
-    lava = {name = "lava", img = "media/block/lava01.png"},
-    basalte = {name = "basalet", img = "media/block/basalt.png"},
-    schiste = {name = "schiste", img = "media/block/schiste.png"},
-    glaise = {name = "glaise", img = "media/block/glaise.png"},
+    guard01 = {name = "lava", img = "media/block/guard_yellow01.png"},
+    snake01 = {name = "basalet", img = "media/block/blue_snake01.png"},
+    --schiste = {name = "schiste", img = "media/block/schiste.png"},
+    --glaise = {name = "glaise", img = "media/block/glaise.png"},
     
 }
 setDefault(BLOCK_TYPE, BLOCK_TYPE.default)
@@ -41,7 +41,7 @@ end
 
 BlockManager = { }
 
-function BlockManager.new()
+function BlockManager.new(nb_width, nb_height)
  
   local self = { }
   
@@ -49,25 +49,28 @@ function BlockManager.new()
   local move_speed = 0.03
  
   local drop_speed = 0
-  local slow_drop_speed = 500
-  local fast_drop_speed = 1000
+  local slow_drop_speed = 850
+  local fast_drop_speed = 1300
   
   local dropped = 0
   local dropping = false
  
-  local group_size = 3
+  local group_size = 2
   local current_group = nil
 
   local block_queue = { }
 
   local well = nil
   
+  local group_pos_x = 0 
+  local group_pos_y = 0
   
-  local function initializeWell()
-    local size = 32
-    local nb_width, nb_height = 12, 15
-    local padX, padY = 204, 52
-    well = Well.new(padX, padY, nb_width, nb_height, size)
+  local function initializeWell(nb_width, nb_height)
+    local padX, padY = 24, 62
+    well = Well.new(padX, padY, nb_width, nb_height)
+    
+    group_pos_x = well.getColumnX(0.5 * well.getWidth() - math.ceil(0.5*group_size) - (group_size)%2)
+    group_pos_y = well.getY() + well.getSize() * (group_size - 1)
   end
   
   -- return a table with the top 'group_size' x blocks
@@ -81,11 +84,10 @@ function BlockManager.new()
     
   -- push a group of 'group_size' x blocks on the top of the queue
   function self.push(group)
-    local y = well.getY()
-    local x = well.getColumnX(0.5 * well.getWidth() - math.ceil(0.5*group_size)) 
+    assert(#group == group_size)
     for i, block_type in ipairs(group) do
-        local new_block = Block.new(block_type, x + i * well.getSize(), y)
-        block_queue[#block_queue + 1] = new_block
+      local new_block = Block.new(block_type, group_pos_x + i * well.getSize(), group_pos_y)
+      block_queue[#block_queue + 1] = new_block
     end    
   end
   
@@ -253,7 +255,7 @@ function BlockManager.new()
   end
 
 
-  initializeWell()
+  initializeWell(nb_width, nb_height)
     
   return self
 end

@@ -8,14 +8,16 @@
 
 Well = { }
 
-function Well.new(pos_x, pos_y, nb_horizontal_block, nb_vertical_block, block_size)
+function Well.new(pos_x, pos_y, nb_horizontal_block, nb_vertical_block)
   local self = { }
+  
+  local image = { }
   
   local x = pos_x
   local y = pos_y
   local width = nb_horizontal_block
   local height = nb_vertical_block
-  local size = block_size
+  local size = 1
   
   local limit_line = 3
   
@@ -68,25 +70,37 @@ function Well.new(pos_x, pos_y, nb_horizontal_block, nb_vertical_block, block_si
   end
   
   function self.draw()  
-    
-      --blocks
-      for y=1,height do
-          for x=1,width do
-              if grid[x][y] then
-                  grid[x][y].draw()
+
+      for j=1,height do
+          for i=1,width do
+              --slots
+              local slot_x = x + image["empty_slot"]:getWidth() * (i - 1)
+              local slot_y = y + image["empty_slot"]:getHeight() * (j - 1)
+              love.graphics.draw(image["empty_slot"], slot_x, slot_y)
+              --blocks
+              if grid[i][j] then
+                  grid[i][j].draw()
               end
           end
       end
       
   end
 
-  --initialize
-  for i=1,width do
-      grid[i] = {}
-      for j=1,height do
-          grid[i][j] = false
-      end
+  local function initialize()
+    
+    image["empty_slot"] = love.graphics.newImage("media/block/empty_slot.png")
+    size = image["empty_slot"]:getWidth()
+    
+    --initialize
+    for i=1,width do
+        grid[i] = {}
+        for j=1,height do
+            grid[i][j] = false
+        end
+    end
   end
+  
+  initialize()
   
   return self
     
