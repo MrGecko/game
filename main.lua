@@ -21,18 +21,19 @@ function love.load()
 
     background = BackgroundFrame.new()
 
-    block_manager = BlockManager.new()
     player = Player.new()
+
+    block_manager = BlockManager.new()
     
 
     for i=1,20 do
         local a = getRandomBlockType()
         local b = getRandomBlockType()
         local c = getRandomBlockType()
-        block_manager.pushLastGroup({a, b, c})
+        block_manager.push({a, b, c})
     end
     
-    block_manager.initializeGroup()
+    block_manager.initialize()
     
 end
 

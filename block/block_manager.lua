@@ -62,18 +62,36 @@ function BlockManager.new()
 
   local well = nil
   
+  
+  local function initializeWell()
+    local size = 32
+    local nb_width, nb_height = 12, 15
+    local padX, padY = 204, 52
+    well = Well.new(padX, padY, nb_width, nb_height, size)
+  end
+  
   -- return a table with the top 'group_size' x blocks
-  function self.peekLastGroup()
+  function self.peek()
     local group = {}
     for i=1,group_size do
         group[i] = block_queue[#block_queue - i + 1]
     end 
     return group
   end
+    
+  -- push a group of 'group_size' x blocks on the top of the queue
+  function self.push(group)
+    local y = well.getY()
+    local x = well.getColumnX(0.5 * well.getWidth() - math.ceil(0.5*group_size)) 
+    for i, block_type in ipairs(group) do
+        local new_block = Block.new(block_type, x + i * well.getSize(), y)
+        block_queue[#block_queue + 1] = new_block
+    end    
+  end
   
   -- return a table with the top 'group_size' x blocks
   -- and remove them from the queue
-  function self.popLastGroup()
+  function self.pop()
     if #block_queue < group_size then
         return nil --error("list is empty")
     else
@@ -86,27 +104,10 @@ function BlockManager.new()
         return group
     end
   end
-  
-  -- push a group of 'group_size' x blocks on the top of the queue
-  function self.pushLastGroup(group)
-    local y = well.getY()
-    local x = well.getColumnX(0.5 * well.getWidth() - math.ceil(0.5*group_size)) 
-    for i, block_type in ipairs(group) do
-        local new_block = Block.new(block_type, x + i * well.getSize(), y)
-        block_queue[#block_queue + 1] = new_block
-    end    
- end
  
   function self.initialize()
-    local size = 32
-    local nb_width, nb_height = 12, 15
-    local padX, padY = 204, 52
-    well = Well.new(padX, padY, nb_width, nb_height, size)
-  end
- 
-  function self.initializeGroup()
     dropped = 0
-    current_group = self.popLastGroup()
+    current_group = self.pop()
   end
     
   -- get the idx of the column where is located the current block
@@ -223,7 +224,7 @@ function BlockManager.new()
       if dropped >= group_size and dropping then
           dropping = false
           dropped = 0
-          current_group = self.popLastGroup()
+          current_group = self.pop()
       end
       
       last_move = last_move + dt
@@ -252,7 +253,7 @@ function BlockManager.new()
   end
 
 
-  self.initialize()
+  initializeWell()
     
   return self
 end
