@@ -47,9 +47,11 @@ function BlockManager.new(nb_width, nb_height)
   
   local last_move = 0
   local last_rotate = 0
-  local move_speed = 0.03
-  local rotate_speed = 0.1
+  local last_drop = 0
+  local move_speed = 0.12
+  local rotate_speed = 0.2
  
+  local drop_interval_speed = 0.3
   local drop_speed = 0
   local slow_drop_speed = 850
   local fast_drop_speed = 1300
@@ -130,8 +132,9 @@ function BlockManager.new(nb_width, nb_height)
   end
   
   function self.moveCurrentGroup(dx, dy)   
-       
-    if current_group ~= nil and not dropping then    
+
+    if current_group ~= nil and not dropping then   
+      
         for i, block in ipairs(current_group) do
             local col = self.getColumn(block)
             local next_col = col + dx 
@@ -139,7 +142,7 @@ function BlockManager.new(nb_width, nb_height)
             local on_screen_dy = 0
                     
             -- check if it is time to move
-            if block ~= nil and last_move >= move_speed then
+            if last_move >= move_speed then
               
                 -- boundaries check
                 local will_hit_left_border = false
@@ -172,12 +175,15 @@ function BlockManager.new(nb_width, nb_height)
         
                 moved = true
                 block.move(on_screen_dx, on_screen_dy)
-            end   
+            else
+                moved = false
+            end
         end
    
         if moved then
-            last_move = 0
+          last_move = 0
         end
+
     end
     
   end
@@ -215,7 +221,7 @@ function BlockManager.new(nb_width, nb_height)
   end
   
   function self.startDropping()
-    if dropped == 0 and not dropping then
+    if dropped == 0 and not dropping and last_drop >= drop_interval_speed then
         
         local droppable = 0
         for i, block in ipairs(current_group) do
@@ -280,10 +286,12 @@ function BlockManager.new(nb_width, nb_height)
           dropped = 0
           current_group = self.pop()
           rotation_state = 1
+          last_drop = 0
       end
       
       last_move = last_move + dt
       last_rotate = last_rotate + dt
+      last_drop = last_drop + dt
       
       if current_group ~= nil then
           self.drop(dt)
