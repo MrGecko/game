@@ -71,6 +71,8 @@ function BlockManager.new(nb_width, nb_height)
   local group_pos_x = 0 
   local group_pos_y = 0
   
+  local chain_min_size = 3
+  
   function self.getGroupSize()
     return group_size
   end
@@ -256,10 +258,23 @@ function BlockManager.new(nb_width, nb_height)
                 if (block.getBottom() + on_screen_dy) >= floor_y then
                     
                     on_screen_dy = floor_y - block.getBottom()
+                    -- the block as reached the floor !
+
+                    local chain = well.getBlockChain(block, col, floor)
+                    --print("chain : ".. #chain)
+                    --table.foreach(chain, function(i, t) table.foreach(t, print) end)
+                    --print("===========")
+                    if #chain >= chain_min_size then
+                      print( #chain.." long chain available at " .. col..", "..floor .." ! ")
+                      table.foreach(chain, function(i, t) table.foreach(t, print) end)
+                    else
+                      print(#chain)
+                    end
                     
                     dropped = dropped + 1
                     block.setDropped(true)
-                    well.setBlock(col, floor, block)     
+                    well.setBlock(col, floor, block)  
+                    
                 end
                
                 block.move(0, on_screen_dy)

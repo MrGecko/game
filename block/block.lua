@@ -15,18 +15,15 @@ function Block.new(block_type, pos_x, pos_y)
   local self =  { }
   
   -- private fields
-  local x = 0
-  local y = 0
+  local x = pos_x
+  local y = pos_y
   --local last_move = 0
   local dropped = false
   local image = nil
+  local symbol = block_type
   
   
   local function initialize(block_type, pos_x, pos_y)
-        --position on screen
-        x = pos_x
-        y = pos_y
-
         image = love.graphics.newImage(BLOCK_TYPE[block_type].img)
   end
   
@@ -37,6 +34,8 @@ function Block.new(block_type, pos_x, pos_y)
   function self.getBottom() return y + self.getHeight() end
   function self.getLeft() return x end
   function self.getTop() return y end
+  
+  function self.getSymbol() return symbol end
 
   function self.setDropped(t) 
     dropped = t
@@ -46,10 +45,17 @@ function Block.new(block_type, pos_x, pos_y)
       return dropped
   end
 
-  function self.move(dx, dy)
-    
+  function self.move(dx, dy)  
     x = x + dx
     y = y + dy
+  end
+  
+  function self.isMatching(block)
+    if block == nil then
+      return false
+    else
+      return symbol == block.getSymbol()
+    end
   end
 
   function self.draw()

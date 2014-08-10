@@ -37,23 +37,6 @@ function Well.new(pos_x, pos_y, nb_horizontal_block, nb_vertical_block, manager)
       return 1 + math.ceil((block.getTop() - y) / size)
   end
 
-  -- get the number of the column where is located the current block
-  function self.getColumnNumber(pos_x)
-      return 1 + (pos_x - x) / size
-  end
-  
-  function self.setBlock(i, j, block)
-    if grid[i][j] then
-        error("cannot set block " .. i .. "," .. j .. ": it is not empty")
-    else
-        grid[i][j] = block
-    end
-  end
-
-  function self.getBlock(i, j)
-      return grid[i][j]
-  end
-  
   function self.getFloorLine(col)
      local floor = height
      for y=1,height do
@@ -65,6 +48,104 @@ function Well.new(pos_x, pos_y, nb_horizontal_block, nb_vertical_block, manager)
      return floor
   end
   
+  -- get the number of the column where is located the current block
+  function self.getColumnNumber(pos_x)
+      return 1 + (pos_x - x) / size
+  end
+  
+  function self.getBlock(i, j)
+      local col = grid[i]
+      if col == nil then
+        return nil
+      else
+        return grid[i][j]
+      end
+  end
+  
+
+  function self.setBlock(i, j, block)
+    if grid[i][j] then
+        error("cannot set block " .. i .. "," .. j .. ": it is not empty")
+    else
+        grid[i][j] = block
+    end
+  end
+
+
+  local function isBlockInChain(chain, block)
+    local result = false 
+    for i, b in ipairs(chain) do
+      if b.x == block.x and b.y == block.y then
+        result = true
+        break
+      end
+    end
+    return result
+  end
+  
+  local function addToChain(chain, new_blocks)
+ 
+    if new_blocks ~= nil then
+      for i,b in ipairs(new_blocks) do
+        if b ~= nil then
+          --print(b.block.getSymbol())
+          if not isBlockInChain(chain, b) then
+            if #chain == 0 then
+              table.insert(chain, b)
+            else
+              --table.foreach(chain, function(j, t) print(t.block.getSymbol()) end)
+              if chain[1].block.isMatching(b.block) then
+              
+              table.insert(chain, b)
+              end
+            end
+          end
+        end
+      end
+    end
+      
+    --table.foreach(chain, function(i, t) table.foreach(t, print) end)
+    return chain
+  end
+
+  function self.getBlockChain(block, x, y, from)
+      local chain = { {block=block, x=x, y=y} }
+    
+      local left = self.getBlock(x-1, y)
+      local right = self.getBlock(x+1, y)
+      local down = self.getBlock(x, y+1)
+      local up = self.getBlock(x, y-1)
+      
+      if left and from ~= "right" then
+        --print("left")
+        --table.foreach(chain, function(i, t) table.foreach(t, print) end)
+        chain = addToChain(chain, self.getBlockChain(left, x-1, y, "left"))
+        --chain = addToChain(chain, left)
+      end
+      
+      if right and from ~= "left" then
+        --print("right")
+        --table.foreach(chain, function(i, t) table.foreach(t, print) end)
+        chain = addToChain(chain, self.getBlockChain(right, x+1, y), "right")
+        --chain = addToChain(chain, right)
+      end
+      
+      if down and from ~= "up" then
+        --print("down")
+        chain = addToChain(chain, self.getBlockChain(down, x, y+1, "down"))
+        --chain = addToChain(chain, down)
+      end
+      
+      if up and from ~= "down" then
+        --print("down")
+        chain = addToChain(chain, self.getBlockChain(up, x, y+1, "up"))
+        --chain = addToChain(chain, down)
+      end
+      
+ 
+      return chain--addToChain(chain, addToChain(left, addToChain(right), down) )
+  end
+
   function self.draw()  
 
       for j=1,height do
