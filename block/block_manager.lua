@@ -46,7 +46,9 @@ function BlockManager.new(nb_width, nb_height)
   local self = { }
   
   local last_move = 0
+  local last_rotate = 0
   local move_speed = 0.03
+  local rotate_speed = 0.1
  
   local drop_speed = 0
   local slow_drop_speed = 850
@@ -62,12 +64,18 @@ function BlockManager.new(nb_width, nb_height)
 
   local well = nil
   
+  local rotation_state = 1
+  
   local group_pos_x = 0 
   local group_pos_y = 0
   
+  function self.getGroupSize()
+    return group_size
+  end
+  
   local function initializeWell(nb_width, nb_height)
     local padX, padY = 24, 62
-    well = Well.new(padX, padY, nb_width, nb_height)
+    well = Well.new(padX, padY, nb_width, nb_height, self)
     
     group_pos_x = well.getColumnX(0.5 * well.getWidth() - math.ceil(0.5*group_size) - (group_size)%2)
     group_pos_y = well.getY() + well.getSize() * (group_size - 1)
@@ -126,22 +134,32 @@ function BlockManager.new(nb_width, nb_height)
     if current_group ~= nil and not dropping then    
         for i, block in ipairs(current_group) do
             local col = self.getColumn(block)
-            local next_col = col + dx        
+            local next_col = col + dx 
             local on_screen_dx = 0
             local on_screen_dy = 0
                     
             -- check if it is time to move
             if block ~= nil and last_move >= move_speed then
+              
                 -- boundaries check
-                if next_col < 1 or next_col <= (#current_group - i) or 
-                (next_col + i - 1) > well.getWidth() then
+                local will_hit_left_border = false
+                local will_hit_right_border = false
+                if rotation_state == 1 then
+                  will_hit_left_border = next_col < 1 or next_col <= (#current_group - i)
+                  will_hit_right_border = next_col > (well.getWidth() - i + 1)
+                elseif rotation_state == 3 then
+                  will_hit_left_border = next_col < 1 or next_col < i
+                  will_hit_right_border = next_col > (well.getWidth() - (group_size - i ))
+                end
+                
+                if will_hit_left_border or will_hit_right_border then
                     on_screen_dx = 0
                 else
                     -- check in order to not pass through higher columns
                     local current_floor = well.getBlockLine(block) 
                     local next_floor = well.getFloorLine(next_col)
                     
-                    if next_floor > current_floor then
+                    if next_floor >= current_floor then
                         -- calculate the horizontal delta for the block movement
                         on_screen_dx = well.getColumnX(next_col) - block.getLeft()
                     else
@@ -161,8 +179,39 @@ function BlockManager.new(nb_width, nb_height)
     
   end
   
+  function self.rotate()
+      if last_rotate >= rotate_speed then
+        -- set next rotation state
+        if rotation_state == 4 then
+          rotation_state = 1
+        else
+          rotation_state = rotation_state + 1
+        end
+        -- transform to reach the rotation state
+        for i,block in ipairs(current_group) do
+          if rotation_state == 1 then
+            --          B
+            -- B A  --> A
+            block.move( (group_size - i) * well.getSize(), well.getSize() * (group_size - i))
+          elseif rotation_state == 2 then
+            -- B
+            -- A    --> A B
+            block.move( -(group_size - i) * well.getSize(), -well.getSize() * (i - 1))
+          elseif rotation_state == 3 then
+            --          B
+            -- A B  --> A
+            block.move( (i - 1) * well.getSize(), well.getSize() * (i - 1))
+          elseif rotation_state == 4 then
+            -- B
+            -- A    --> B A
+            block.move( -(i - 1) * well.getSize(), -well.getSize() * (group_size - i))
+          end
+        end
+      last_rotate = 0
+      end
+  end
   
-  function self.startDroppingCurrentGroup()
+  function self.startDropping()
     if dropped == 0 and not dropping then
         
         local droppable = 0
@@ -171,7 +220,7 @@ function BlockManager.new(nb_width, nb_height)
             if not block.isDropped() then
                 local col = self.getColumn(block)
                 local floor = well.getFloorLine(col) 
-                if floor >= well.getLimitLine() then
+                if floor > group_size then
                     droppable = droppable + 1
                 end
             end
@@ -183,7 +232,7 @@ function BlockManager.new(nb_width, nb_height)
   end
 
   -- drop the current block until it reaches the bottom of the well or another block
-  function self.dropCurrentGroup(dt)
+  function self.drop(dt)
    
     if dropped < group_size and dropping then
         local dy = math.floor(drop_speed * dt)
@@ -227,12 +276,14 @@ function BlockManager.new(nb_width, nb_height)
           dropping = false
           dropped = 0
           current_group = self.pop()
+          rotation_state = 1
       end
       
       last_move = last_move + dt
+      last_rotate = last_rotate + dt
       
       if current_group ~= nil then
-          self.dropCurrentGroup(dt)
+          self.drop(dt)
       end
 
   end

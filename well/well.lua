@@ -8,7 +8,7 @@
 
 Well = { }
 
-function Well.new(pos_x, pos_y, nb_horizontal_block, nb_vertical_block)
+function Well.new(pos_x, pos_y, nb_horizontal_block, nb_vertical_block, manager)
   local self = { }
   
   local image = { }
@@ -17,12 +17,10 @@ function Well.new(pos_x, pos_y, nb_horizontal_block, nb_vertical_block)
   local y = pos_y
   local width = nb_horizontal_block
   local height = nb_vertical_block
-  local size = 1
-  
-  local limit_line = 3
-  
+  local size = nil
+    
   local padding = {top=2, left=6, bottom=6, right=6 }
-  
+  local block_manager = nil
   local grid = { }
   
   function self.getX() return x end
@@ -30,8 +28,6 @@ function Well.new(pos_x, pos_y, nb_horizontal_block, nb_vertical_block)
   function self.getWidth() return width end
   function self.getHeight() return height end
   function self.getSize() return size end
-    
-  function self.getLimitLine() return limit_line end
   
   function self.getColumnX(idx)
       return x + size * (idx - 1)
@@ -76,7 +72,14 @@ function Well.new(pos_x, pos_y, nb_horizontal_block, nb_vertical_block)
               --slots
               local slot_x = x + image["empty_slot"]:getWidth() * (i - 1)
               local slot_y = y + image["empty_slot"]:getHeight() * (j - 1)
-              love.graphics.draw(image["empty_slot"], slot_x, slot_y)
+              
+              local slot_img = image["empty_slot"]
+              if j <= block_manager.getGroupSize() then
+                slot_img = image["limit_slot"]
+              end
+     
+              love.graphics.draw(slot_img, slot_x, slot_y)
+              
               --blocks
               if grid[i][j] then
                   grid[i][j].draw()
@@ -89,7 +92,10 @@ function Well.new(pos_x, pos_y, nb_horizontal_block, nb_vertical_block)
   local function initialize()
     
     image["empty_slot"] = love.graphics.newImage("media/block/empty_slot.png")
+    image["limit_slot"] = love.graphics.newImage("media/block/limit_slot.png")
     size = image["empty_slot"]:getWidth()
+    
+    block_manager = manager
     
     --initialize
     for i=1,width do

@@ -24,13 +24,17 @@ function Player.new()
         direction = "right"
      end
 
-     if love.keyboard.isDown("left", "q", "a") then
+     if love.keyboard.isDown("left", "q") then
         block_manager.moveCurrentGroup(-1, 0)
         direction = "left"
      end
 
-     if love.keyboard.isDown(" ") then
-        block_manager.startDroppingCurrentGroup()
+     if love.keyboard.isDown("down", "s") then
+        block_manager.startDropping()
+     end
+     
+     if love.keyboard.isDown("up", "z", "a") then
+        block_manager.rotate()
      end
      
      if love.keyboard.isDown("lshift") then
