@@ -150,6 +150,9 @@ function BlockManager.new(nb_width, nb_height)
                 elseif rotation_state == 3 then
                   will_hit_left_border = next_col < 1 or next_col < i
                   will_hit_right_border = next_col > (well.getWidth() - (group_size - i ))
+                else
+                  will_hit_left_border = next_col < 1
+                  will_hit_right_border = next_col > well.getWidth()
                 end
                 
                 if will_hit_left_border or will_hit_right_border then
