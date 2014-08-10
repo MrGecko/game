@@ -5,8 +5,8 @@
 -- Time: 12:13
 -- To change this template use File | Settings | File Templates.
 --
-require "frame"
-require "block_manager"
+require "frame/background"
+require "block/block_manager"
 require "player"
 
 
@@ -19,35 +19,33 @@ function love.load()
     
     love.keyboard.setKeyRepeat(true)
 
-    game_frame = newGameFrame()
+    background = BackgroundFrame.new()
 
-    block_manager = newBlockManager()
-    player = newPlayer()
+    block_manager = BlockManager.new()
+    player = Player.new()
     
 
     for i=1,20 do
         local a = getRandomBlockType()
         local b = getRandomBlockType()
         local c = getRandomBlockType()
-        block_manager:pushLastGroup({a, b, c})
+        block_manager.pushLastGroup({a, b, c})
     end
     
-    block_manager:initializeGroup()
+    block_manager.initializeGroup()
     
 end
 
 
 function love.update(dt)
     player.keyboard(dt)
-    block_manager:update(dt)
+    block_manager.update(dt)
 end
 
 function love.draw()
-    game_frame:draw()
-
-    block_manager:draw()
-
-    player:draw()
+    background.draw()
+    block_manager.draw()
+    player.draw()
 end
 
 
@@ -55,7 +53,6 @@ function love.keypressed(key)
     if key == "escape" then
         love.event.quit()
     end
-
 end
 
 
